@@ -14,7 +14,7 @@ class Category:
         self.name = name
 
     def random_item(self):
-        return random.choice(self.items)
+        return (self.name, random.choice(self.items))
 
     def add_item(self, item):
         self.items.append(item)
@@ -29,10 +29,10 @@ class Section:
         return self.categories[k]
 
     def random_category(self):
-        return random.choice(self.categories.items())
+        return random.choice(list(self.categories.items()))
 
     def random_item(self):
-        return self.random_category()[1].random_item()
+        return (self.name, self.random_category()[1].random_item())
 
     def new_category(self, cat_name):
         self.categories[cat_name.lower()] = Category(cat_name)

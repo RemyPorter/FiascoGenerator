@@ -76,28 +76,20 @@ def process(filehandle):
     first_section = True
     first_cat = True
     for line in filehandle:
-        try:
-            linecount += 1
-            if first_line:
-                playset = build_playset(line)
-                first_line = False
-            elif is_section(line):
-                assert(linecount == 2 and first_section) #second line must be a section
-                current_section = build_section(playset, line)
-                first_section = False
-            elif is_cat(line):
-                assert(linecount == 3 and first_cat) #third line must be a category
-                current_cat = build_cat(current_section, line)
-                first_cat = False
-            else:
-                current_cat.add_item(parse_line(line)[1])
-        except AssertionError as e:
-            print "Failed assertion on line %i" % linecount
-            print line
-        except Exception as e:
-            print "Error on line %i" %linecount
-            print line
-            print e
+        linecount += 1
+        if first_line:
+            playset = build_playset(line)
+            first_line = False
+        elif is_section(line):
+            assert(linecount == 2 or not first_section) #second line must be a section
+            current_section = build_section(playset, line)
+            first_section = False
+        elif is_cat(line):
+            assert(linecount == 3 or not first_cat) #third line must be a category
+            current_cat = build_cat(current_section, line)
+            first_cat = False
+        else:
+            current_cat.add_item(parse_line(line)[1])
     return playset
 
 if __name__ == '__main__':

@@ -8,8 +8,13 @@ class Connection(object):
         self.detail = detail
 
     def __repr__(self):
-        return "{0} connects to {1} as {2} and they share {3}".format(
-            self.left, self.right, self.relationship, self.detail)
+        return """
+        ----------------
+        {0} / {1}
+        Relationship: {2}
+        Detail: {3}
+        ----------------""".format(self.left, self.right,
+            self.relationship, self.detail)
 
 class ConnectionModel(object):
     """The build method should yield a tuple of every
@@ -90,7 +95,7 @@ class Setup(object):
     >>> f[1].right
     'Jimbob'
     """
-    def __init__(self, playset, characters, ConnectionModelType, SectionChoiceModelType):
+    def __init__(self, playset, characters, ConnectionModelType=Circular, SectionChoiceModelType=SimpleSectionChoiceModel):
         self.playset = playset
         self.characters = characters
         self.connections = ConnectionModelType(characters)
