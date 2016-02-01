@@ -16,7 +16,7 @@ class Connection(object):
         ----------------""".format(self.left, self.right,
             self.relationship, self.detail)
 
-class ConnectionModel(object):
+class ConnectionStrategy(object):
     """The build method should yield a tuple of every
     possible character combination for this connection model.
 
@@ -28,7 +28,7 @@ class ConnectionModel(object):
         """Should yield a tuple of characters."""
         pass
 
-class Circular(ConnectionModel):
+class Circular(ConnectionStrategy):
     """A circular connection model, that is to say,
     the basic loop around the table that is a standard
     Fiasco
@@ -41,7 +41,7 @@ class Circular(ConnectionModel):
     [('Jimbob', 'Joebob'), ('Joebob', 'Sallybob'), ('Sallybob', 'Jimbob')]
     """
     def __init__(self, character_set):
-        ConnectionModel.__init__(self, character_set)
+        ConnectionStrategy.__init__(self, character_set)
 
     def build(self):
         prev = self.character_set[-1]
@@ -49,14 +49,14 @@ class Circular(ConnectionModel):
             yield prev, c
             prev = c
 
-class SimpleSectionChoiceModel(object):
+class SimpleSectionChoiceStrategy(object):
     """How to choose what *kinds* of details. This should be
     an infinite iterator that returns sections with a chosen behavior.
 
     >>> count = 0
     >>> stop = 4
     >>> res = []
-    >>> model = SimpleSectionChoiceModel(mock)
+    >>> model = SimpleSectionChoiceStrategy(mock)
     >>> for s in model.choices():
     ...   res.append(s)
     ...   count += 1
@@ -82,7 +82,7 @@ class Setup(object):
     """
     The setup for a Fiasco, controlled by Connection and Choice models.
 
-    >>> s = Setup(mock, ["Joebob", "Jimbob", "Sallybob"], Circular, SimpleSectionChoiceModel)
+    >>> s = Setup(mock, ["Joebob", "Jimbob", "Sallybob"], Circular, SimpleSectionChoiceStrategy)
     >>> f = s.build()
     >>> len(f)
     3
@@ -95,11 +95,11 @@ class Setup(object):
     >>> f[1].right
     'Jimbob'
     """
-    def __init__(self, playset, characters, ConnectionModelType=Circular, SectionChoiceModelType=SimpleSectionChoiceModel):
+    def __init__(self, playset, characters, ConnectionStrategyType=Circular, SectionChoiceStrategyType=SimpleSectionChoiceStrategy):
         self.playset = playset
         self.characters = characters
-        self.connections = ConnectionModelType(characters)
-        self.choices = SectionChoiceModelType(playset).choices()
+        self.connections = ConnectionStrategyType(characters)
+        self.choices = SectionChoiceStrategyType(playset).choices()
         self.fiasco = []
 
     def build(self):
