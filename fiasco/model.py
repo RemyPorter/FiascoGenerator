@@ -31,9 +31,12 @@ class Section:
     def random_category(self):
         return random.choice(self.categories.items())
 
+    def random_item(self):
+        return self.random_category()[1].random_item()
+
     def new_category(self, cat_name):
-        self.categories[cat_name] = Category(cat_name)
-        return self.categories[cat_name]
+        self.categories[cat_name.lower()] = Category(cat_name)
+        return self.categories[cat_name.lower()]
 
 class Playset:
     def __init__(self, name):
@@ -44,8 +47,8 @@ class Playset:
         return self.sections[k]
 
     def new_section(self, sect_name):
-        self.sections[sect_name] = Section(sect_name)
-        return self.sections[sect_name]
+        self.sections[sect_name.lower()] = Section(sect_name)
+        return self.sections[sect_name.lower()]
 
 if __name__ == '__main__':
     import doctest

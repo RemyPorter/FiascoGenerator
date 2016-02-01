@@ -14,7 +14,7 @@ Test
 >>> playset = process(f)
 >>> playset.name
 'Test'
->>> playset["RELATIONSHIPS"]["Family"].items
+>>> playset["relationships"]["family"].items
 ['Parent / Child', 'Cousins']
 """
 
@@ -39,11 +39,11 @@ def build_playset(line):
 
 def build_section(playset, line):
     title = skip(line, SECTION_HEADER)
-    return playset.new_section(title)
+    return playset.new_section(title.lower())
 
 def build_cat(section, line):
     title = parse_line(skip(line, CAT_HEADER))[1]
-    return section.new_category(title)
+    return section.new_category(title.lower())
 
 def is_cat(line):
     """
