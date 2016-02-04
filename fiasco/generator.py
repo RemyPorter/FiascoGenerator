@@ -75,6 +75,10 @@ class RandomPairings(ConnectionStrategy):
     """A connection model that builds random pairings, without
     repeats. Every name will appear *at least* twice.
 
+    `min_connectivity` controls how "dense" the graph may be.
+    It's the minimum number of connections allowed for any
+    character.
+
     >>> import functools
     >>> rp = RandomPairings(["Joebob", "Jimbob", "Sallybob"])
     >>> l = []
@@ -84,11 +88,12 @@ class RandomPairings(ConnectionStrategy):
     True
     """
 
-    def __init__(self, character_set):
+    def __init__(self, character_set, min_connectivity = 2):
         ConnectionStrategy.__init__(self, character_set)
         self.names = {name:list() for name in character_set}
         self.consumed = set()
         self.namecount = collections.defaultdict(int)
+        self.min_cons = min_connectivity
 
     def done(self):
         """
@@ -102,8 +107,11 @@ class RandomPairings(ConnectionStrategy):
         >>> rp.namecount["Sallybob"] = 2
         >>> rp.done()
         True
+        >>> rp.min_cons = 5
+        >>> rp.done()
+        False
         """
-        return len(list(itertools.ifilter(lambda x: x >= 2,
+        return len(list(itertools.ifilter(lambda x: x >= self.min_cons,
             self.namecount.values()))) == len(self.character_set)
 
     def build(self):
