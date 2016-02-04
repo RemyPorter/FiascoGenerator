@@ -94,6 +94,8 @@ class RandomPairings(ConnectionStrategy):
         self.consumed = set()
         self.namecount = collections.defaultdict(int)
         self.min_cons = min_connectivity
+        if (self.min_cons > len(character_set) - 1):
+            raise "Too dense- process could never finish."
 
     def done(self):
         """
