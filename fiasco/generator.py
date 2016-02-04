@@ -1,4 +1,7 @@
 from . import model
+import itertools
+import collections
+import random
 
 class Connection(object):
     def __init__(self, left, right, relationship, detail):
@@ -48,6 +51,80 @@ class Circular(ConnectionStrategy):
         for c in self.character_set:
             yield prev, c
             prev = c
+
+class CombinationPairings(ConnectionStrategy):
+    """A connection model that takes your population and
+    finds every possible combination
+
+    >>> cp = CombinationPairings(["Joebob", "Jimbob", "Sallybob"])
+    >>> res = []
+    >>> for tpl in cp.build():
+    ...   res.append(tpl)
+    >>> res
+    [('Joebob', 'Jimbob'), ('Joebob', 'Sallybob'), ('Jimbob', 'Sallybob')]
+    """
+
+    def __init__(self, character_set):
+        ConnectionStrategy.__init__(self, character_set)
+
+    def build(self):
+        for a,b in itertools.combinations(self.character_set, 2):
+            yield a,b
+
+class RandomPairings(ConnectionStrategy):
+    """A connection model that builds random pairings, without
+    repeats. Every name will appear *at least* twice.
+
+    >>> import functools
+    >>> rp = RandomPairings(["Joebob", "Jimbob", "Sallybob"])
+    >>> l = []
+    >>> for tpl in rp.build():
+    ...   l.append(tpl)
+    >>> len(l) >= 3
+    True
+    """
+
+    def __init__(self, character_set):
+        ConnectionStrategy.__init__(self, character_set)
+        self.names = {name:list() for name in character_set}
+        self.consumed = set()
+        self.namecount = collections.defaultdict(int)
+
+    def done(self):
+        """
+        Is the process done (has at least two connections for each character?)
+
+        >>> rp = RandomPairings(["Joebob", "Jimbob", "Sallybob"])
+        >>> rp.namecount["Joebob"] = 2
+        >>> rp.done()
+        False
+        >>> rp.namecount["Jimbob"] = 3
+        >>> rp.namecount["Sallybob"] = 2
+        >>> rp.done()
+        True
+        """
+        return len(list(itertools.ifilter(lambda x: x >= 2,
+            self.namecount.values()))) == len(self.character_set)
+
+    def build(self):
+        for a,b in itertools.combinations(self.character_set, 2):
+            self.names[a].append((a,b))
+            self.names[b].append((a,b))
+        while not self.done():
+            n = random.choice(self.character_set)
+            possible = random.choice(self.names[n])
+            if possible in self.consumed:
+                continue
+            yield possible
+            self.consumed.add(possible)
+            a,b = possible
+            self.namecount[a] += 1
+            self.namecount[b] += 1
+
+
+
+
+
 
 class SimpleSectionChoiceStrategy(object):
     """How to choose what *kinds* of details. This should be
